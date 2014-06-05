@@ -1,132 +1,221 @@
-package com.mycompany.test1;
-
-import com.google.gwt.resources.client.CssResource;
-import javax.servlet.annotation.WebServlet;
+package com.mycompany.aaa;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.client.metadata.TypeDataStore;
 import com.vaadin.data.Property;
 import com.vaadin.data.validator.EmailValidator;
-import com.vaadin.data.validator.RegexpValidator;
 import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.annotations.Push;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import javax.servlet.annotation.WebServlet;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import sun.security.pkcs11.Secmod;
 
-@Push 
 @Theme("mytheme")
 @SuppressWarnings("serial")
 public class MyVaadinUI extends UI
 {
 
     @WebServlet(value = "/*", asyncSupported = true)
-    @VaadinServletConfiguration(productionMode = false, ui = MyVaadinUI.class, widgetset = "com.mycompany.test1.AppWidgetSet")
+    @VaadinServletConfiguration(productionMode = false, ui = MyVaadinUI.class, widgetset = "com.mycompany.aaa.AppWidgetSet")
     public static class Servlet extends VaadinServlet {
     }
-
+    String value="0";
+    final VerticalLayout layout = new VerticalLayout();
+    public List<Osoba> db = new ArrayList<Osoba>();
+    
+    public void addperson(){
+    Osoba o = new Osoba();
+    Osoba x = new Osoba();
+    Osoba y = new Osoba();
+    o.setMiasto("Kolonia");
+    o.setImie("Konrad");
+    o.setNazwisko("Nowal");
+    o.setTelefon("111111");
+    db.add(o);
+    x.setMiasto("Szczytno");
+    x.setImie("Mietek");
+    x.setNazwisko("Kowalski");
+    x.setTelefon("33333");
+    db.add(x);
+    y.setMiasto("Olsztyn");
+    y.setImie("Lukas");
+    y.setNazwisko("Plichta");
+    y.setTelefon("22222");
+    db.add(y);
+    }
+    public List<Osoba> getAllosoba()
+    {
+    return db;
+    }
+    public void dajosobe(int indeks ,VerticalLayout layout2 )
+    {
+        for ( Osoba p : db){
+                    if("elooo".equals(p.getImie())){
+			
+                        //layout2.addComponent();
+                    }
+        
+        }
+    }
+     public void autorzyacja(MyVaadinUI ui ,VerticalLayout layout2 ,String pass , String login)
+    {
+        for ( Osoba p : db){
+                    if(login.equals(p.getImie())&&pass.equals(p.getTelefon())){
+			  ui.value = "1";
+                        // Save to VaadinServiceSession
+                        ui.getSession().setAttribute("myValue", value);
+                        // Save to HttpSession
+                        VaadinService.getCurrentRequest().getWrappedSession().setAttribute("myValue", value);
+                      //  getPage().setLocation(getPage().getLocation());
+                            Label ok = new Label("Jestes zalogowany "+login+ " ");
+                            layout.addComponent(ok);
+                            
+                //layout2.addComponent(new Label("Udane logowanie"));
+                        //layout2.addComponent();
+                    }
+        
+        }
+        layout2.addComponent(new Label("Nie Udane logowanie"));
+    }
+    
+    
+       
+        
     @Override
     protected void init(VaadinRequest request) {
-        final TextField name = new TextField("Imię:");
-        final TextField nazwisko = new TextField("Nazwisko:");
-        final TextField email = new TextField("Mail:");
-        final PasswordField haslo = new PasswordField("Hasło:");
-        final TextField kod = new TextField("Kod Pocztowy:");
-        final TextField miasto = new TextField("Miasto:");
+ addperson();
         
-        final Button send = new Button("Wyślij");
-        
-        Property.ValueChangeListener checkForm = new Property.ValueChangeListener() {
+        final TextField imie = new TextField("Podaj imie aby się zalogować:");
+        final VerticalLayout layout2 = new VerticalLayout();
+        final VerticalLayout layout3 = new VerticalLayout();
+      dajosobe(1,layout2);
+        layout.setMargin(true);
+         layout.setSpacing(true);
+          layout2.setSpacing(true);
+           layout3.setSpacing(true);
+        setContent(layout);
+        layout.addComponent(layout2);
+        layout.addComponent(layout3);
+        layout2.setWidth("50%");
+        layout3.setWidth("50%");
+        layout2.setMargin(true);
+        layout3.setMargin(false);
+        //private String[] talica = {"marek", "konrad"};
+
+           final TextField login = new TextField("Imie");
+            final PasswordField password = new PasswordField("Numer telefonu");
+            
+           
+            layout2.addComponent(login); 
+            login.focus();
+            layout2.addComponent(password); 
+            final Button loginButton = new Button("Logowanko", new Button.ClickListener() {
+                public void buttonClick(ClickEvent event) {
+                 // saveValue(SettingReadingSessionAttributesUI.this, value);
+                autorzyacja(MyVaadinUI.this,layout,  password.getValue(),login.getValue() );
+                }
+            });
+            layout2.addComponent(loginButton); 
+            Property.ValueChangeListener checkForm = new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                if(name.isValid() && email.isValid() && haslo.isValid() && kod.isValid()) {
-                    send.setEnabled(true);
+                if(login.isValid() && password.isValid()) {
+                    loginButton.setEnabled(true);
                 } else {
-                    send.setEnabled(false);
+                    loginButton.setEnabled(false);
                 }
             }
         };
-        name.addValueChangeListener(checkForm);
-        nazwisko.addValueChangeListener(checkForm);
-        email.addValueChangeListener(checkForm);
-        haslo.addValueChangeListener(checkForm);
-        kod.addValueChangeListener(checkForm);
-        miasto.addValueChangeListener(checkForm);
-        name.setTextChangeEventMode(AbstractTextField.TextChangeEventMode.EAGER);
-        nazwisko.setTextChangeEventMode(AbstractTextField.TextChangeEventMode.EAGER);
-        email.setTextChangeEventMode(AbstractTextField.TextChangeEventMode.EAGER);
-        haslo.setTextChangeEventMode(AbstractTextField.TextChangeEventMode.EAGER);
-        kod.setTextChangeEventMode(AbstractTextField.TextChangeEventMode.EAGER);
-        miasto.setTextChangeEventMode(AbstractTextField.TextChangeEventMode.EAGER);
+        //walidacja emaila
+        login.addValidator(new StringLengthValidator("Login minimum 2 znaków", 2, Integer.MIN_VALUE, false));
 
-        // imię
-        name.addValidator(new RegexpValidator("^[A-Za-zĄĆĘŁŃÓŚŹŻąćęłóńśźż ]+$", "Zły format"));
-        name.addValidator(new StringLengthValidator("Za krutkie!", 3, 100, true));
-        
-        // nazwisko
-        nazwisko.addValidator(new RegexpValidator("^[A-Za-zĄĆĘŁŃÓŚŹŻąćęłóńśźż ]+$", "Niepoprawny format"));
-        nazwisko.addValidator(new StringLengthValidator("Za krutkie!", 3, 100, true));
-        
-        // e-mail
-        email.addValidator(new EmailValidator("Zły e-mail"));
-        email.addValidator(new StringLengthValidator("Musisz tu coś wpisać :/", 1, Integer.MIN_VALUE, false));
+        // walidacja hasło
+        password.addValidator(new StringLengthValidator("Hasło minimum 4 znaków", 4, Integer.MIN_VALUE, false));
 
-        // hasło
-        haslo.addValidator(new StringLengthValidator("Minimum 10 znaków!", 10, Integer.MIN_VALUE, false));
-
-        // kod
-        kod.addValidator(new RegexpValidator("^[0-9][0-9]-[0-9][0-9][0-9]$", "Niepoprawny format"));
-        kod.addValidator(new StringLengthValidator("Wpisz coś!", 1, Integer.MIN_VALUE, false));
+        login.addValueChangeListener(checkForm);
+        password.addValueChangeListener(checkForm);
+        login.setTextChangeEventMode(AbstractTextField.TextChangeEventMode.EAGER);
+        password.setTextChangeEventMode(AbstractTextField.TextChangeEventMode.EAGER);
+        login.setImmediate(true);
+        password.setImmediate(true);
         
-        // miasto
-        miasto.addValidator(new RegexpValidator("^[A-Za-zĄĆĘŁŃÓŚŹŻąćęłóńśźż ]+$", "Niepoprawny format"));
-        miasto.addValidator(new StringLengthValidator("Za krutkie!", 3, 100, true));
         
-        // wyświetl
-        final FormLayout layout = new FormLayout();
-        layout.setMargin(true);
-        layout.addStyleName("konrad");
-        layout.setSpacing(true);
-        setContent(layout);
-
-        name.setImmediate(true);
-        nazwisko.setImmediate(true);
-        email.setImmediate(true);
-        haslo.setImmediate(true);
-        kod.setImmediate(true);
-        miasto.setImmediate(true);
         
-        layout.addComponent(name);
-        layout.addComponent(nazwisko);
-        layout.addComponent(email);
-        layout.addComponent(haslo);
-        layout.addComponent(kod);
-        layout.addComponent(miasto);
-
-        
-
-        send.setEnabled(false);
-        send.addClickListener(new Button.ClickListener() {
-            @Override
+       String x = imie.getValue();
+        layout2.addComponent(imie);
+        Button button = new Button ("Click Me");
+        button.addClickListener(new Button.ClickListener() {
             public void buttonClick(ClickEvent event) {
-                layout.addComponent(new Label(name.getValue()));
-                layout.addComponent(new Label(nazwisko.getValue()));
-                layout.addComponent(new Label(email.getValue()));
-                layout.addComponent(new Label(kod.getValue()+"    "+miasto.getValue()));
+                for(int l=0 ;l<db.size();l++)
+                {
+                layout2.addComponent(new Label(db.get(l).getImie()));
+                layout3.addComponent(new Label(db.get(l).getTelefon()));
                 
+                }
             }
         });
-        layout.addComponent(send);
+        layout2.addComponent(button);
+        
+	 
        
     }
 
-}    
+}
+
+
+//JSONObject obj = new JSONObject();
+	//obj.put("name", "mkyong.com");
+       // JSONParser parser = new JSONParser();
+ 
+/*	try {
+ 
+		//bject obj = parser.parse(new FileReader("C:\\Users\\Konrad\\Documents\\GitHub\\wizyt-wka-Vaadin\\wizytowkakody.json");
+ 
+		//JSONObject jsonObject = (JSONObject) obj;
+ 
+		//String name = (String) jsonObject.get("name");
+		//System.out.println(name);
+ 
+		long age = (Long) jsonObject.get("age");
+		System.out.println(age);
+ 
+		// loop array
+		JSONArray msg = (JSONArray) jsonObject.get("messages");
+		Iterator<String> iterator = msg.iterator();
+		while (iterator.hasNext()) {
+			System.out.println(iterator.next());
+		}
+ 
+	} catch (FileNotFoundException e) {
+		e.printStackTrace();
+	} catch (IOException e) {
+		e.printStackTrace();
+	} catch (ParseException e) {
+		e.printStackTrace();
+	}
+  */     
+//http://e-java.pl/kurs-java/czesc-2-pierwsze-kroki/wyswietlanie-informacji-na-ekranie/
+//http://www.mkyong.com/java/json-simple-example-read-and-write-json/
+//http://javastart.pl/klasy/arrays-operacje-na-tablicach/
