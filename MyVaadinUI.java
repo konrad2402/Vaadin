@@ -38,7 +38,6 @@ import sun.security.pkcs11.Secmod;
 @SuppressWarnings("serial")
 public class MyVaadinUI extends UI
 {
-
     @WebServlet(value = "/*", asyncSupported = true)
     @VaadinServletConfiguration(productionMode = false, ui = MyVaadinUI.class, widgetset = "com.mycompany.aaa.AppWidgetSet")
     public static class Servlet extends VaadinServlet {
@@ -85,7 +84,6 @@ public class MyVaadinUI extends UI
                        szczeg =p.getImie()+": "+p.getOpis();
                     }
         }
-        
          layout1.removeComponent(lab);
          lab.setValue(szczeg);
          layout1.addComponent(lab);
@@ -96,12 +94,16 @@ public class MyVaadinUI extends UI
             layout1.removeComponent(table);
 		table.addContainerProperty("Imie", String.class, null);
                 table.addContainerProperty("Nazwisko", String.class, null);
+		table.addContainerProperty("Miasto", String.class, null);
+                table.addContainerProperty("Telefon", String.class, null);
 		table.addContainerProperty("Szczegóły", Button.class, null);
                 table.addContainerProperty("Usuń", Button.class, null);
 		for (final Osoba p : db){
 			Item item = table.addItem(p.getImie());
 			item.getItemProperty("Imie").setValue(p.getImie());
                         item.getItemProperty("Nazwisko").setValue(p.getNazwisko());
+			item.getItemProperty("Miasto").setValue(p.getMiasto());
+                        item.getItemProperty("Telefon").setValue(p.getTelefon());
                        
                 final Button show = new Button("Szczegóły", new Button.ClickListener() {
                     public void buttonClick(ClickEvent event) {
@@ -118,21 +120,15 @@ public class MyVaadinUI extends UI
                 item.getItemProperty("Usuń").setValue(del);
             }
             }
-		
-
 		layout1.addComponent(table);
-
 	}
         
-    
      public void autorzyacja(MyVaadinUI ui ,VerticalLayout layout2 ,String pass , String login)
     {
         for ( Osoba p : db){
                     if(login.equals(p.getImie())&&pass.equals(p.getTelefon())){
                         ui.getSession().setAttribute("myValue", "1");
                         VaadinService.getCurrentRequest().getWrappedSession().setAttribute("status", "1");
-//layout2.addComponent(new Label("Udane logowanie"));
-                        
                     }
         
         }
@@ -153,10 +149,8 @@ public class MyVaadinUI extends UI
     @Override
     protected void init(VaadinRequest request) {
         addperson();
-        
-        //final TextField imie = new TextField("Podaj imie aby się zalogować:");
         final VerticalLayout layout2 = new VerticalLayout();
-        final HorizontalLayout layout3 = new HorizontalLayout();
+        final VerticalLayout layout3 = new VerticalLayout();
         layout.setMargin(true);
          layout.setSpacing(true);
           layout2.setSpacing(true);
@@ -164,15 +158,14 @@ public class MyVaadinUI extends UI
         setContent(layout);
         layout.addComponent(layout2);
         layout.addComponent(layout3);
-        layout2.setWidth("50%");
-        layout3.setWidth("50%");
+        layout2.setWidth("40%");
+        layout3.setWidth("40%");
         layout2.setMargin(true);
         layout3.setMargin(false);
-        //private String[] talica = {"marek", "konrad"};
+        
         if("1".equals(VaadinService.getCurrentRequest().getWrappedSession()
                         .getAttribute("status")))
         {
-            
            final Button logoutt = new Button("Wyloguj", new Button.ClickListener() {
             public void buttonClick(ClickEvent event) {
                 logout();
@@ -215,58 +208,5 @@ public class MyVaadinUI extends UI
         login.setImmediate(true);
         password.setImmediate(true);
         }
-        
-        
-        
-        
     }
-
 }
-
-
-//JSONObject obj = new JSONObject();
-	//obj.put("name", "mkyong.com");
-       // JSONParser parser = new JSONParser();
- 
-/*	Button button = new Button ("Click Me");
-        button.addClickListener(new Button.ClickListener() {
-            public void buttonClick(ClickEvent event) {
-                for(int l=0 ;l<db.size();l++)
-                {
-                layout2.addComponent(new Label(db.get(l).getImie()));
-                layout3.addComponent(new Label(db.get(l).getTelefon()));
-                
-                }
-            }
-        });
-layout2.addComponent(button);
-try {
- 
-		//bject obj = parser.parse(new FileReader("C:\\Users\\Konrad\\Documents\\GitHub\\wizyt-wka-Vaadin\\wizytowkakody.json");
- 
-		//JSONObject jsonObject = (JSONObject) obj;
- 
-		//String name = (String) jsonObject.get("name");
-		//System.out.println(name);
- 
-		long age = (Long) jsonObject.get("age");
-		System.out.println(age);
- 
-		// loop array
-		JSONArray msg = (JSONArray) jsonObject.get("messages");
-		Iterator<String> iterator = msg.iterator();
-		while (iterator.hasNext()) {
-			System.out.println(iterator.next());
-		}
- 
-	} catch (FileNotFoundException e) {
-		e.printStackTrace();
-	} catch (IOException e) {
-		e.printStackTrace();
-	} catch (ParseException e) {
-		e.printStackTrace();
-	}
-  */     
-//http://e-java.pl/kurs-java/czesc-2-pierwsze-kroki/wyswietlanie-informacji-na-ekranie/
-//http://www.mkyong.com/java/json-simple-example-read-and-write-json/
-//http://javastart.pl/klasy/arrays-operacje-na-tablicach/
