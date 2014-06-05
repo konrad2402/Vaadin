@@ -3,6 +3,7 @@ package com.mycompany.aaa;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.client.metadata.TypeDataStore;
+import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.data.validator.StringLengthValidator;
@@ -15,6 +16,7 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.PasswordField;
+import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -41,33 +43,52 @@ public class MyVaadinUI extends UI
     @VaadinServletConfiguration(productionMode = false, ui = MyVaadinUI.class, widgetset = "com.mycompany.aaa.AppWidgetSet")
     public static class Servlet extends VaadinServlet {
     }
-    String value="0";
     final VerticalLayout layout = new VerticalLayout();
     public List<Osoba> db = new ArrayList<Osoba>();
+    Label lab =new Label();
+    final TextField searchName = new TextField("Szukaj");
+    private Table table = new Table("Czlowieki ;)");
     
     public void addperson(){
-    Osoba o = new Osoba();
-    Osoba x = new Osoba();
-    Osoba y = new Osoba();
-    o.setMiasto("Kolonia");
-    o.setImie("Konrad");
-    o.setNazwisko("Nowal");
-    o.setTelefon("111111");
-    db.add(o);
-    x.setMiasto("Szczytno");
-    x.setImie("Mietek");
-    x.setNazwisko("Kowalski");
-    x.setTelefon("33333");
-    db.add(x);
-    y.setMiasto("Olsztyn");
-    y.setImie("Lukas");
-    y.setNazwisko("Plichta");
-    y.setTelefon("22222");
-    db.add(y);
+            Osoba o = new Osoba();
+            Osoba x = new Osoba();
+            Osoba y = new Osoba();
+            o.setMiasto("Kolonia");
+            o.setImie("Konrad");
+            o.setNazwisko("Nowal");
+            o.setTelefon("111111");
+            db.add(o);
+            x.setMiasto("Szczytno");
+            x.setImie("Mietek");
+            x.setNazwisko("Kowalski");
+            x.setTelefon("33333");
+            db.add(x);
+            y.setMiasto("Olsztyn");
+            y.setImie("test");
+            y.setNazwisko("test");
+            y.setTelefon("1111");
+            db.add(y);
     }
+    
     public List<Osoba> getAllosoba()
     {
-    return db;
+            return db;
+    }
+    public void szczegol(Osoba z ,VerticalLayout layout1 ){
+        String tel= z.getTelefon();
+        String szczeg="";
+        for ( Osoba p : db){
+                    if(tel.equals(p.getTelefon())){
+                       szczeg ="Nazywam się " + p.getImie()+" "+p.getNazwisko()+",mieszkam w "+p.getMiasto()+". Mój nr tel"+p.getTelefon()+" Zadzwoń !!!";
+                    }
+        
+        }
+        
+         layout1.removeComponent(lab);
+         lab.setValue(szczeg);
+         layout1.addComponent(lab);
+        
+        
     }
     public void dajosobe(int indeks ,VerticalLayout layout2 )
     {
@@ -79,37 +100,35 @@ public class MyVaadinUI extends UI
         
         }
     }
+    
+    
      public void autorzyacja(MyVaadinUI ui ,VerticalLayout layout2 ,String pass , String login)
     {
         for ( Osoba p : db){
                     if(login.equals(p.getImie())&&pass.equals(p.getTelefon())){
-			  ui.value = "1";
-                        // Save to VaadinServiceSession
-                        ui.getSession().setAttribute("myValue", value);
-                        // Save to HttpSession
-                        VaadinService.getCurrentRequest().getWrappedSession().setAttribute("myValue", value);
-                      //  getPage().setLocation(getPage().getLocation());
-                            Label ok = new Label("Jestes zalogowany "+login+ " ");
-                            layout.addComponent(ok);
-                            
-                //layout2.addComponent(new Label("Udane logowanie"));
-                        //layout2.addComponent();
+                        ui.getSession().setAttribute("myValue", "1");
+                        VaadinService.getCurrentRequest().getWrappedSession().setAttribute("status", "1");
+//layout2.addComponent(new Label("Udane logowanie"));
+                        
                     }
         
         }
-        layout2.addComponent(new Label("Nie Udane logowanie"));
-    }
-    
-    
-       
+        getPage().setLocation(getPage().getLocation());
         
+        if("0".equals(VaadinService.getCurrentRequest().getWrappedSession()
+                        .getAttribute("status")))
+        {
+            layout2.addComponent(new Label("Nie Udane logowanie"));
+        }
+    }
+       
     @Override
     protected void init(VaadinRequest request) {
- addperson();
+        addperson();
         
         final TextField imie = new TextField("Podaj imie aby się zalogować:");
         final VerticalLayout layout2 = new VerticalLayout();
-        final VerticalLayout layout3 = new VerticalLayout();
+        final HorizontalLayout layout3 = new HorizontalLayout();
       dajosobe(1,layout2);
         layout.setMargin(true);
          layout.setSpacing(true);
@@ -123,12 +142,10 @@ public class MyVaadinUI extends UI
         layout2.setMargin(true);
         layout3.setMargin(false);
         //private String[] talica = {"marek", "konrad"};
-
+        
            final TextField login = new TextField("Imie");
-            final PasswordField password = new PasswordField("Numer telefonu");
-            
-           
-            layout2.addComponent(login); 
+           final PasswordField password = new PasswordField("Numer telefonu");
+           layout2.addComponent(login); 
             login.focus();
             layout2.addComponent(password); 
             final Button loginButton = new Button("Logowanko", new Button.ClickListener() {
@@ -148,12 +165,10 @@ public class MyVaadinUI extends UI
                 }
             }
         };
-        //walidacja emaila
+        //walidacja imienia
         login.addValidator(new StringLengthValidator("Login minimum 2 znaków", 2, Integer.MIN_VALUE, false));
-
-        // walidacja hasło
+        // walidacja hasla
         password.addValidator(new StringLengthValidator("Hasło minimum 4 znaków", 4, Integer.MIN_VALUE, false));
-
         login.addValueChangeListener(checkForm);
         password.addValueChangeListener(checkForm);
         login.setTextChangeEventMode(AbstractTextField.TextChangeEventMode.EAGER);
@@ -163,9 +178,18 @@ public class MyVaadinUI extends UI
         
         
         
-       String x = imie.getValue();
-        layout2.addComponent(imie);
-        Button button = new Button ("Click Me");
+        
+        
+    }
+
+}
+
+
+//JSONObject obj = new JSONObject();
+	//obj.put("name", "mkyong.com");
+       // JSONParser parser = new JSONParser();
+ 
+/*	Button button = new Button ("Click Me");
         button.addClickListener(new Button.ClickListener() {
             public void buttonClick(ClickEvent event) {
                 for(int l=0 ;l<db.size();l++)
@@ -176,20 +200,8 @@ public class MyVaadinUI extends UI
                 }
             }
         });
-        layout2.addComponent(button);
-        
-	 
-       
-    }
-
-}
-
-
-//JSONObject obj = new JSONObject();
-	//obj.put("name", "mkyong.com");
-       // JSONParser parser = new JSONParser();
- 
-/*	try {
+layout2.addComponent(button);
+try {
  
 		//bject obj = parser.parse(new FileReader("C:\\Users\\Konrad\\Documents\\GitHub\\wizyt-wka-Vaadin\\wizytowkakody.json");
  
