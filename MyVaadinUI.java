@@ -101,6 +101,7 @@ public class MyVaadinUI extends UI
         }
     }
     
+        
     
      public void autorzyacja(MyVaadinUI ui ,VerticalLayout layout2 ,String pass , String login)
     {
@@ -120,6 +121,11 @@ public class MyVaadinUI extends UI
         {
             layout2.addComponent(new Label("Nie Udane logowanie"));
         }
+    }
+    public void logout()
+    {
+        VaadinService.getCurrentRequest().getWrappedSession().setAttribute("status", "0");
+        getPage().setLocation(getPage().getLocation());
     }
        
     @Override
@@ -142,7 +148,22 @@ public class MyVaadinUI extends UI
         layout2.setMargin(true);
         layout3.setMargin(false);
         //private String[] talica = {"marek", "konrad"};
-        
+        if("1".equals(VaadinService.getCurrentRequest().getWrappedSession()
+                        .getAttribute("status")))
+        {
+            
+           final Button logoutt = new Button("Wyloguj", new Button.ClickListener() {
+            public void buttonClick(ClickEvent event) {
+                logout();
+                //FORM(layout);
+                }
+            });
+            //logoutt.addStyleName("Siemka"); 
+            layout3.addComponent(logoutt); 
+            
+        }
+        else
+        {
            final TextField login = new TextField("Imie");
            final PasswordField password = new PasswordField("Numer telefonu");
            layout2.addComponent(login); 
@@ -175,7 +196,7 @@ public class MyVaadinUI extends UI
         password.setTextChangeEventMode(AbstractTextField.TextChangeEventMode.EAGER);
         login.setImmediate(true);
         password.setImmediate(true);
-        
+        }
         
         
         
