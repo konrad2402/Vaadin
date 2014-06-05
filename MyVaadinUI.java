@@ -56,17 +56,20 @@ public class MyVaadinUI extends UI
             o.setMiasto("Kolonia");
             o.setImie("Konrad");
             o.setNazwisko("Nowal");
-            o.setTelefon("111111");
+            o.setTelefon("668822709");
+            o.setOpis("Lubi motocykle i wycieczki, student.");
             db.add(o);
             x.setMiasto("Szczytno");
             x.setImie("Mietek");
             x.setNazwisko("Kowalski");
-            x.setTelefon("33333");
+            x.setTelefon("251486223");
+            x.setOpis("Dobry programista PHP, lubi filmy.");
             db.add(x);
             y.setMiasto("Olsztyn");
             y.setImie("test");
             y.setNazwisko("test");
             y.setTelefon("1111");
+            y.setOpis("Mało interesujący, właściwie kto to jest?.");
             db.add(y);
     }
     
@@ -79,28 +82,47 @@ public class MyVaadinUI extends UI
         String szczeg="";
         for ( Osoba p : db){
                     if(tel.equals(p.getTelefon())){
-                       szczeg ="Nazywam się " + p.getImie()+" "+p.getNazwisko()+",mieszkam w "+p.getMiasto()+". Mój nr tel"+p.getTelefon()+" Zadzwoń !!!";
+                       szczeg =p.getImie()+": "+p.getOpis();
                     }
-        
         }
         
          layout1.removeComponent(lab);
          lab.setValue(szczeg);
          layout1.addComponent(lab);
-        
-        
     }
-    public void dajosobe(int indeks ,VerticalLayout layout2 )
-    {
-        for ( Osoba p : db){
-                    if("elooo".equals(p.getImie())){
-			
-                        //layout2.addComponent();
-                    }
-        
-        }
-    }
-    
+    public void pokaOsobe(final VerticalLayout layout1){
+        {
+           table.removeAllItems();
+            layout1.removeComponent(table);
+		table.addContainerProperty("Imie", String.class, null);
+                table.addContainerProperty("Nazwisko", String.class, null);
+		table.addContainerProperty("Szczegóły", Button.class, null);
+                table.addContainerProperty("Usuń", Button.class, null);
+		for (final Osoba p : db){
+			Item item = table.addItem(p.getImie());
+			item.getItemProperty("Imie").setValue(p.getImie());
+                        item.getItemProperty("Nazwisko").setValue(p.getNazwisko());
+                       
+                final Button show = new Button("Szczegóły", new Button.ClickListener() {
+                    public void buttonClick(ClickEvent event) {
+                        szczegol(p , layout1);
+                     }
+            });  
+                final Button del = new Button("Usun", new Button.ClickListener() {
+                    public void buttonClick(ClickEvent event) {
+                        db.remove(p);
+                        pokaOsobe(layout1);
+                     }
+            });  
+                item.getItemProperty("Szczegóły").setValue(show);
+                item.getItemProperty("Usuń").setValue(del);
+            }
+            }
+		
+
+		layout1.addComponent(table);
+
+	}
         
     
      public void autorzyacja(MyVaadinUI ui ,VerticalLayout layout2 ,String pass , String login)
@@ -114,13 +136,13 @@ public class MyVaadinUI extends UI
                     }
         
         }
-        getPage().setLocation(getPage().getLocation());
-        
         if("0".equals(VaadinService.getCurrentRequest().getWrappedSession()
                         .getAttribute("status")))
         {
             layout2.addComponent(new Label("Nie Udane logowanie"));
         }
+        getPage().setLocation(getPage().getLocation());
+        
     }
     public void logout()
     {
@@ -132,10 +154,9 @@ public class MyVaadinUI extends UI
     protected void init(VaadinRequest request) {
         addperson();
         
-        final TextField imie = new TextField("Podaj imie aby się zalogować:");
+        //final TextField imie = new TextField("Podaj imie aby się zalogować:");
         final VerticalLayout layout2 = new VerticalLayout();
         final HorizontalLayout layout3 = new HorizontalLayout();
-      dajosobe(1,layout2);
         layout.setMargin(true);
          layout.setSpacing(true);
           layout2.setSpacing(true);
@@ -155,24 +176,21 @@ public class MyVaadinUI extends UI
            final Button logoutt = new Button("Wyloguj", new Button.ClickListener() {
             public void buttonClick(ClickEvent event) {
                 logout();
-                //FORM(layout);
                 }
             });
-            //logoutt.addStyleName("Siemka"); 
             layout3.addComponent(logoutt); 
             
+            pokaOsobe(layout2);
         }
         else
         {
            final TextField login = new TextField("Imie");
            final PasswordField password = new PasswordField("Numer telefonu");
            layout2.addComponent(login); 
-            login.focus();
             layout2.addComponent(password); 
             final Button loginButton = new Button("Logowanko", new Button.ClickListener() {
                 public void buttonClick(ClickEvent event) {
-                 // saveValue(SettingReadingSessionAttributesUI.this, value);
-                autorzyacja(MyVaadinUI.this,layout,  password.getValue(),login.getValue() );
+                    autorzyacja(MyVaadinUI.this,layout,  password.getValue(),login.getValue() );
                 }
             });
             layout2.addComponent(loginButton); 
